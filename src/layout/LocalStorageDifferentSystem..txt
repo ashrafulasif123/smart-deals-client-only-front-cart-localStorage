@@ -1,0 +1,130 @@
+-------------------------------------
+---------------System 1(PHero)--------------
+-------------------------------------
+const [cart, setCart] = useState([]);
+
+  useEffect(() => {
+    axios.get("/products.json").then((data) => {
+      const products = data.data;
+      let items = JSON.parse(localStorage.getItem("cart")) || [];
+      const result = products.filter((product) => items.includes(product.id));
+      setCart(result);
+    });
+  }, []);
+
+  const handleAddCart = (id, product) => {
+    const existProduct = cart.find((c) => c.id === id);
+    if (existProduct) {
+      return alert("You have already Add This Product");
+    }
+    const updateCart = [...cart, product];
+    setCart(updateCart);
+    // LocalStorage Cart
+
+    let items = JSON.parse(localStorage.getItem("cart")) || [];
+
+    // const existItem = items.find((itemId) => itemId === id);
+    const updateItems = [...items, id];
+    localStorage.setItem("cart", JSON.stringify(updateItems));
+  };
+
+  ---------------------------------
+  ---------System 2(Gemini)--------
+  ---------------------------------
+
+  const [products, setProducts] = useState([]);
+  const [cartIds, setCartIds] = useState([]);
+
+  useEffect(() => {
+    axios.get("/products.json").then((data) => {
+      setProducts(data.data);
+      const itemsId = getIdsFromLocalStorage("cart");
+      setCartIds(itemsId);
+    });
+  }, []);
+  const handleAddCart = (id) => {
+    if (cartIds.includes(id)) {
+      return Swal.fire("Already Added This Product");
+    }
+    const updateItemsId = [...cartIds, id];
+    setCartIds(updateItemsId);
+    setIdsToLocalStorage(updateItemsId, "cart");
+  };
+
+---------------------------------
+--------System 3(Chatgpt)--------
+---------------------------------
+
+  const [cart, setCart] = useState([]);
+  const [products, setProducts] = useState([]);
+
+  // Products load
+  useEffect(() => {
+    axios.get("/products.json").then((res) => {
+      setProducts(res.data);
+    });
+  }, []);
+
+  // LocalStorage থেকে cart IDs নিয়ে product বের করা
+  useEffect(() => {
+    const cartIds = JSON.parse(localStorage.getItem("cart")) || [];
+
+    const result = products.filter((product) =>
+      cartIds.includes(product.id)
+    );
+
+    setCart(result);
+  }, [products]);
+
+  // Add to cart
+  const handleAddCart = (id) => {
+    const cartIds = JSON.parse(localStorage.getItem("cart")) || [];
+
+    // Already added?
+    if (cartIds.includes(id)) {
+      return Swal.fire("You have already added this Product");
+    }
+
+    const updateCartIds = [...cartIds, id];
+
+    // LocalStorage update
+    localStorage.setItem("cart", JSON.stringify(updateCartIds));
+
+    // সাথে সাথে React state update
+    const addedProduct = products.find((product) => product.id === id);
+
+    setCart((prevCart) => [...prevCart, addedProduct]);
+  };
+
+---------------------------------
+--------System 3(Another)--------
+---------------------------------
+
+ const [products, setProducts] = useState([]);
+  const [cart, setCart] = useState([]);
+
+  useEffect(() => {
+    axios.get("/products.json").then((data) => {
+      setProducts(data.data);
+    });
+  }, []);
+
+  useEffect(() => {
+    const cartIds = JSON.parse(localStorage.getItem("cart")) || [];
+    const cartProducts = products.filter((product) =>
+      cartIds.includes(product.id),
+    );
+    setCart(cartProducts);
+  }, [products]);
+
+  const handleAddCart = (id) => {
+    const existProduct = cart.find((product) => product.id === id);
+    if (existProduct) return alert("You have already added this product");
+    const newProduct = products.find((product) => product.id === id);
+    setCart([...cart, newProduct]);
+    const cartIds = cart.map((product) => product.id);
+    const updateCartIds = [...cartIds, id];
+    localStorage.setItem("cart", JSON.stringify(updateCartIds));
+  };
+
+  
